@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ResourceShortageManager.Models
+
 {
     public class Shortage
     {

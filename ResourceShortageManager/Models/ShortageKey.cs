@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+
 namespace ResourceShortageManager.Models
+
 {
     public class ShortageKey
     {

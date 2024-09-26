@@ -15,9 +15,9 @@ public static class FileManager
     private static JsonSerializerOptions serializerOptions = new()
     {
         Converters =
-        {
-                new JsonStringEnumConverter()
-        },
+    {
+        new JsonStringEnumConverter()
+    },
         WriteIndented = true
     };
 
@@ -29,22 +29,30 @@ public static class FileManager
         }
 
         string json = File.ReadAllText(filePath);
-        List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, serializerOptions);
 
-        if (shortages is null)
+        try
+        {
+            List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, serializerOptions);
+
+            if (shortages is null)
+            {
+                return new Dictionary<ShortageKey, Shortage>();
+            }
+
+            Dictionary<ShortageKey, Shortage> shortagesDictionary = new();
+
+            foreach (Shortage shortage in shortages)
+            {
+                ShortageKey key = new ShortageKey(shortage.Title, shortage.Category);
+                shortagesDictionary[key] = shortage;
+            }
+
+            return shortagesDictionary;
+        }
+        catch (JsonException)
         {
             return new Dictionary<ShortageKey, Shortage>();
         }
-
-        Dictionary<ShortageKey, Shortage> shortagesDictionary = new();
-
-        foreach (Shortage shortage in shortages)
-        {
-            ShortageKey key = new ShortageKey(shortage.Title, shortage.Category);
-            shortagesDictionary[key] = shortage;
-        }
-
-        return shortagesDictionary;
     }
     public static void SerializeShortages(string filePath, Dictionary<ShortageKey, Shortage> shortages)
     {

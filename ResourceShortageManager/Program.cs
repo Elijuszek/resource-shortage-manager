@@ -1,5 +1,6 @@
 ﻿using ResourceShortageManager.Models;
 using ResourceShortageManager.Utilities;
+using ResourceShortageManager.Services;
 
 namespace ResourceShortageManager;
 

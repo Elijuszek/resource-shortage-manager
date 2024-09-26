@@ -1,18 +1,15 @@
-﻿using System.ComponentModel;
+﻿namespace ResourceShortageManager.Models;
 
-namespace ResourceShortageManager.Models
+public enum Room
 {
-    public enum Room
-    {
-        MeetingRoom,
-        Bathroom,
-        Kitchen
-    }
+    MeetingRoom,
+    Bathroom,
+    Kitchen
+}
 
-    public enum Category
-    {
-        Electronics,
-        Other,
-        Food
-    }
+public enum Category
+{
+    Electronics,
+    Other,
+    Food
 }
