@@ -26,13 +26,11 @@ namespace ResourceShortageManager.Utilities
             HashSet<string> validInputs = new HashSet<string>
             {
                 "1", "2", "3",
-                "Electronics", "Food", "Other",
                 "cancel"
             };
 
             do
             {
-                Console.Clear();
                 Console.WriteLine(message);
                 Console.WriteLine("1. Electronics");
                 Console.WriteLine("2. Food");
@@ -44,9 +42,10 @@ namespace ResourceShortageManager.Utilities
             return input.ToLower() switch
             {
                 "cancel" => Category.None,
-                "1" or "electronics" => Category.Electronics,
-                "2" or "food" => Category.Food,
-                _ => Category.Other
+                "1" => Category.Electronics,
+                "2" => Category.Food,
+                "3" => Category.Other,
+                _ => Category.None
             };
         }
 
@@ -57,13 +56,11 @@ namespace ResourceShortageManager.Utilities
             HashSet<string> validInputs = new HashSet<string>
             {
                 "1", "2", "3",
-                "Meeting Room", "Bathroom", "Kitchen",
                 "cancel"
             };
 
             do
             {
-                Console.Clear();
                 Console.WriteLine(message);
                 Console.WriteLine("1. Meeting Room");
                 Console.WriteLine("2. Bathroom");
@@ -74,10 +71,10 @@ namespace ResourceShortageManager.Utilities
 
             return input.ToLower() switch
             {
-                "cancel" => Room.None,
-                "1" or "meeting room" => Room.MeetingRoom,
-                "2" or "bathroom" => Room.Bathroom,
-                _ => Room.Kitchen
+                "1" => Room.MeetingRoom,
+                "2" => Room.Bathroom,
+                "3" => Room.Kitchen,
+                _ => Room.None
             };
         }
 
@@ -88,7 +85,6 @@ namespace ResourceShortageManager.Utilities
 
             do
             {
-                Console.Clear();
                 Console.WriteLine(message);
                 input = PromptInput();
 

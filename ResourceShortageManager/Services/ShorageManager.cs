@@ -3,17 +3,19 @@ using ResourceShortageManager.Utilities;
 
 namespace ResourceShortageManager.Services;
 
-class ShorageManager
+public class ShorageManager
 {
     private readonly string _currentUser;
     private readonly string _pathJson;
     private Dictionary<ShortageKey, Shortage> _shortages;
+    private FileManager _fileManager;
 
     public ShorageManager(string username, string filePath)
     {
         _currentUser = username;
         _pathJson = filePath;
-        _shortages = FileManager.DeserializeShortages(filePath);
+        _fileManager = new FileManager();
+        _shortages = _fileManager.DeserializeShortages(filePath);
     }
 
     public void Meniu()
@@ -58,12 +60,15 @@ class ShorageManager
             switch (input)
             {
                 case "1" or "list":
+                    Console.Clear();
                     ListShortages();
                     break;
                 case "2" or "add":
+                    Console.Clear();
                     result = AddShortage();
                     break;
                 case "3" or "remove":
+                    Console.Clear();
                     result = RemoveShortage();
                     break;
                 case "4" or "cancel":
@@ -75,9 +80,8 @@ class ShorageManager
         }
     }
 
-    private Status AddShortage()
+    public Status AddShortage()
     {
-        Console.Clear();
         Console.WriteLine("Add Shortage");
 
         // Get title and check if canceled
@@ -116,13 +120,12 @@ class ShorageManager
 
         _shortages[key] = shortage;
 
-        FileManager.SerializeShortages(_pathJson, _shortages);
+        _fileManager.SerializeShortages(_pathJson, _shortages);
         return Status.AddedSuccessfully;
     }
 
-    private Status RemoveShortage()
+    public Status RemoveShortage()
     {
-        Console.Clear();
         Console.WriteLine("Remove Shortage");
 
         // Get title and check if canceled
@@ -143,7 +146,7 @@ class ShorageManager
         }
 
         _shortages.Remove(key);
-        FileManager.SerializeShortages(_pathJson, _shortages);
+        _fileManager.SerializeShortages(_pathJson, _shortages);
         return Status.RemovedSuccessfully;
     }
 

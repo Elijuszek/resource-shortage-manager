@@ -2,49 +2,59 @@
 using ResourceShortageManager.Models;
 using System.Text.Json.Serialization;
 
-namespace ResourceShortageManager.Utilities;
-
-public static class FileManager
+namespace ResourceShortageManager.Utilities
 {
-    private static JsonSerializerOptions serializerOptions = new()
+    public class FileManager
     {
-        Converters =
-    {
-        new JsonStringEnumConverter()
-    },
-        WriteIndented = true
-    };
+        private JsonSerializerOptions _serializerOptions;
 
-    public static Dictionary<ShortageKey, Shortage> DeserializeShortages(string filePath)
-    {
-        if (!File.Exists(filePath))
+        public FileManager()
         {
-            return new Dictionary<ShortageKey, Shortage>();
+            _serializerOptions = new JsonSerializerOptions
+            {
+                Converters =
+                {
+                    new JsonStringEnumConverter()
+                },
+                WriteIndented = true
+            };
         }
 
-        string json = File.ReadAllText(filePath);
-
-        List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, serializerOptions);
-
-        if (shortages is null)
+        public Dictionary<ShortageKey, Shortage> DeserializeShortages(string filePath)
         {
-            return new Dictionary<ShortageKey, Shortage>();
+            if (!File.Exists(filePath))
+            {
+                return new Dictionary<ShortageKey, Shortage>();
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var reader = new StreamReader(fileStream))
+            {
+                string json = reader.ReadToEnd();
+                List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, _serializerOptions);
+
+                if (shortages is null)
+                {
+                    return new Dictionary<ShortageKey, Shortage>();
+                }
+
+                return shortages.ToDictionary(
+                    shortage => new ShortageKey(shortage.Title, shortage.Room),
+                    shortage => shortage
+                );
+            }
         }
 
-        Dictionary<ShortageKey, Shortage> shortagesDictionary = new();
-
-        foreach (Shortage shortage in shortages)
+        public void SerializeShortages(string filePath, Dictionary<ShortageKey, Shortage> shortages)
         {
-            ShortageKey key = new ShortageKey(shortage.Title, shortage.Room);
-            shortagesDictionary[key] = shortage;
-        }
+            List<Shortage> shortagesList = shortages.Values.ToList();
+            string json = JsonSerializer.Serialize(shortagesList, _serializerOptions);
 
-        return shortagesDictionary;
-    }
-    public static void SerializeShortages(string filePath, Dictionary<ShortageKey, Shortage> shortages)
-    {
-        List<Shortage> shortagesList = shortages.Values.ToList();
-        string json = JsonSerializer.Serialize(shortagesList, serializerOptions);
-        File.WriteAllText(filePath, json);
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var writer = new StreamWriter(fileStream))
+            {
+                writer.Write(json);
+            }
+        }
     }
 }
