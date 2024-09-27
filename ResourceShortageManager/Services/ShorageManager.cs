@@ -149,6 +149,90 @@ class ShorageManager
 
     public void ListShortages()
     {
-        PrintManager.PrintShortagesList(_shortages);
+        string titleFilter = "";
+        DateTime? startDateFilter = null;
+        DateTime? endDateFilter = null;
+        Room roomFilter = Room.None;
+        Category categoryFilter = Category.None;
+
+        var filteredShortages = _shortages.Where(s =>
+                (s.Value.Name == _currentUser || _currentUser == "admin")
+            ).OrderByDescending(s => s.Value.Priority).ToDictionary(s => s.Key, s => s.Value);
+
+        while (true)
+        {
+            Console.Clear();
+            PrintManager.PrintShortagesList(filteredShortages);
+
+            Console.WriteLine("Choose a filter to apply:");
+            Console.WriteLine("1. Title");
+            Console.WriteLine("2. Start date");
+            Console.WriteLine("3. End date");
+            Console.WriteLine("4. Room");
+            Console.WriteLine("5. Category");
+            Console.WriteLine("6. Reset all filters");
+            Console.WriteLine("7. Exit");
+
+            string input = PrintManager.PromptInput("Enter your choice");
+
+            switch (input)
+            {
+                case "1":
+                    titleFilter = PrintManager.PromptInput("Enter filter title");
+                    if (string.IsNullOrWhiteSpace(titleFilter) || titleFilter.ToLower() == "cancel")
+                    {
+                        continue;
+                    }
+                    break;
+                case "2":
+                    startDateFilter = PrintManager.PromptDateTime("Enter start date (year-month-day-hour-minutes)");
+                    if (startDateFilter is null)
+                    {
+                        continue;
+                    }
+                    break;
+                case "3":
+                    endDateFilter = PrintManager.PromptDateTime("Enter end date (year-month-day-hour-minutes)");
+                    if (endDateFilter is null)
+                    {
+                        continue;
+                    }
+                    break;
+                case "4":
+                    roomFilter = PrintManager.PromptRoom("Enter category");
+                    if (roomFilter == Room.None)
+                    {
+                        continue;
+                    }
+                    break;
+                case "5":
+                    categoryFilter = PrintManager.PromptCategory("Enter category");
+                    if (categoryFilter == Category.None)
+                    {
+                        continue;
+                    }
+                    break;
+                case "6":
+                    titleFilter = "";
+                    startDateFilter = null;
+                    endDateFilter = null;
+                    roomFilter = Room.None;
+                    categoryFilter = Category.None;
+                    break;
+                case "7" or "cancel":
+                    return;
+                default:
+                    break;
+            }
+
+            filteredShortages = _shortages.Where(s =>
+                (string.IsNullOrEmpty(titleFilter) || s.Value.Title.Contains(titleFilter, StringComparison.OrdinalIgnoreCase)) &&
+                (categoryFilter == Category.None || s.Value.Category == categoryFilter) &&
+                (roomFilter == Room.None || (s.Value.Room == roomFilter)) &&
+                (!startDateFilter.HasValue || s.Value.CreatedOn >= startDateFilter.Value) &&
+                (!endDateFilter.HasValue || s.Value.CreatedOn <= endDateFilter.Value) &&
+                (s.Value.Name == _currentUser || _currentUser == "admin")
+            ).OrderByDescending(s => s.Value.Priority).ToDictionary(s => s.Key, s => s.Value);
+        }
     }
 }

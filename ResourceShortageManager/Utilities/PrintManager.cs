@@ -1,4 +1,5 @@
 ﻿using ResourceShortageManager.Models;
+using System.Globalization;
 
 namespace ResourceShortageManager.Utilities
 {
@@ -99,22 +100,65 @@ namespace ResourceShortageManager.Utilities
             return number;
         }
 
+        public static DateTime? PromptDateTime(string message = "")
+        {
+            string? input;
+            DateTime parsedDateTime;
 
+            do
+            {
+                Console.WriteLine($"{message} (or type 'exit' or 'cancel' to cancel):");
+                input = Console.ReadLine();
+
+                if (input?.ToLower() is "exit" or "cancel" or null)
+                    return null;
+
+            } while (string.IsNullOrWhiteSpace(input) || !TryParseDateTime(input, out parsedDateTime));
+
+            return parsedDateTime;
+        }
+
+        private static bool TryParseDateTime(string input, out DateTime parsedDateTime)
+        {
+            string[] formats =
+            {
+                "yyyy",
+                "yyyy-MM",
+                "yyyy-MM-dd",
+                "yyyy-MM-dd-HH",
+                "yyyy-MM-dd-HH-mm"
+            };
+
+            return DateTime.TryParseExact(input, formats,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out parsedDateTime);
+        }
+        public static void PrintTitles()
+        {
+            string header = string.Format("| {0, -25} | {1, -10} | {2, -15} | {3, -12} | {4, -8} | {5, -25} |",
+                "Title", "Name", "Room", "Category", "Priority", "Created On");
+
+            string separator = new string('-', header.Length);
+            Console.WriteLine(separator);
+            Console.WriteLine(header);
+            Console.WriteLine(separator);
+        }
         public static void PrintShortagesList(Dictionary<ShortageKey, Shortage> shortages)
         {
-            Console.Clear();
             Console.WriteLine("Registered shortages:");
+
+            if (shortages.Count == 0)
+            {
+                PrintWarning("No shortages found.");
+                return;
+            }
+            PrintTitles();
             foreach (Shortage shortage in shortages.Values)
             {
                 Console.WriteLine(shortage.ToString());
             }
-            string? input;
-            do
-            {
-                Console.WriteLine("type 'exit' or 'cancel' to exit:");
-                input = Console.ReadLine();
-            } while (input is not "exit" and not "cancel");
-            Console.Clear();
+            Console.WriteLine();
         }
 
         public static void PrintSuccess(string message)
