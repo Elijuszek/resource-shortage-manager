@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.IO;
+﻿using System.Text.Json;
 using ResourceShortageManager.Models;
 using System.Text.Json.Serialization;
 
@@ -30,29 +24,22 @@ public static class FileManager
 
         string json = File.ReadAllText(filePath);
 
-        try
-        {
-            List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, serializerOptions);
+        List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, serializerOptions);
 
-            if (shortages is null)
-            {
-                return new Dictionary<ShortageKey, Shortage>();
-            }
-
-            Dictionary<ShortageKey, Shortage> shortagesDictionary = new();
-
-            foreach (Shortage shortage in shortages)
-            {
-                ShortageKey key = new ShortageKey(shortage.Title, shortage.Category);
-                shortagesDictionary[key] = shortage;
-            }
-
-            return shortagesDictionary;
-        }
-        catch (JsonException)
+        if (shortages is null)
         {
             return new Dictionary<ShortageKey, Shortage>();
         }
+
+        Dictionary<ShortageKey, Shortage> shortagesDictionary = new();
+
+        foreach (Shortage shortage in shortages)
+        {
+            ShortageKey key = new ShortageKey(shortage.Title, shortage.Room);
+            shortagesDictionary[key] = shortage;
+        }
+
+        return shortagesDictionary;
     }
     public static void SerializeShortages(string filePath, Dictionary<ShortageKey, Shortage> shortages)
     {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace ResourceShortageManager.Models
 
@@ -8,26 +6,26 @@ namespace ResourceShortageManager.Models
     public class ShortageKey
     {
         public string Title { get; }
-        public Category Category { get; }
+        public Room Room { get; }
 
-        public ShortageKey(string title, Category category)
+        public ShortageKey(string title, Room category)
         {
             Title = NormalizeString(title);
-            Category = category;
+            Room = category;
         }
 
         public override bool Equals(object? obj)
         {
             if (obj is ShortageKey otherKey)
             {
-                return Title == otherKey.Title && Category == otherKey.Category;
+                return Title == otherKey.Title && Room == otherKey.Room;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Title, Category);
+            return HashCode.Combine(Title, Room);
         }
 
         private string NormalizeString(string str)

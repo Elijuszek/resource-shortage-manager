@@ -9,10 +9,7 @@ class Program
     static void Main()
     {
         string path = @"..\..\..\shortages.json";
-        Console.Clear();
-        Console.WriteLine("Started Resource Shortage Manager");
-
-        string? username = PrintManager.PromptUser("Enter your username");
+        string? username = PrintManager.PromptInput("Enter your username");
 
         if (username is null)
         {
@@ -21,6 +18,6 @@ class Program
         }
 
         ShorageManager manager = new(username, path);
-
+        manager.Meniu();
     }
 }

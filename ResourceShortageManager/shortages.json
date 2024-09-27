@@ -5,7 +5,7 @@
     "Room": "Kitchen",
     "Category": "Food",
     "Priority": 1,
-    "CreatedOn": "2024-09-21T09:00:00.0000000+03:00"
+    "CreatedOn": "2024-09-21T09:00:00+03:00"
   },
   {
     "Title": "Whiteboard Erasers",
@@ -13,7 +13,7 @@
     "Room": "MeetingRoom",
     "Category": "Electronics",
     "Priority": 4,
-    "CreatedOn": "2024-09-21T09:30:00.0000000+03:00"
+    "CreatedOn": "2024-09-21T09:30:00+03:00"
   },
   {
     "Title": "Projector",
@@ -21,7 +21,7 @@
     "Room": "MeetingRoom",
     "Category": "Electronics",
     "Priority": 6,
-    "CreatedOn": "2024-09-21T10:00:00.0000000+03:00"
+    "CreatedOn": "2024-09-21T10:00:00+03:00"
   },
   {
     "Title": "Hand Soap",
@@ -29,7 +29,7 @@
     "Room": "Bathroom",
     "Category": "Other",
     "Priority": 8,
-    "CreatedOn": "2024-09-21T10:30:00.0000000+03:00"
+    "CreatedOn": "2024-09-21T10:30:00+03:00"
   },
   {
     "Title": "Batteries",
@@ -37,6 +37,6 @@
     "Room": "MeetingRoom",
     "Category": "Electronics",
     "Priority": 9,
-    "CreatedOn": "2024-09-21T11:00:00.0000000+03:00"
+    "CreatedOn": "2024-09-21T11:00:00+03:00"
   }
 ]

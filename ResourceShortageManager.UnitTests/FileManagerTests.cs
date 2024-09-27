@@ -79,8 +79,8 @@ public class FileManagerTests
         var result = FileManager.DeserializeShortages(FilePath);
 
         Assert.Equal(2, result.Count);
-        Assert.True(result.ContainsKey(new ShortageKey("Test Shortage A", Category.Electronics)));
-        Assert.True(result.ContainsKey(new ShortageKey("Test Shortage B", Category.Food)));
+        Assert.True(result.ContainsKey(new ShortageKey("Test Shortage A", Room.MeetingRoom)));
+        Assert.True(result.ContainsKey(new ShortageKey("Test Shortage B", Room.Bathroom)));
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class FileManagerTests
     {
         var shortages = new Dictionary<ShortageKey, Shortage>
     {
-        { new ShortageKey("Test Shortage A", Category.Electronics), new Shortage()
+        { new ShortageKey("Test Shortage A", Room.MeetingRoom), new Shortage()
             {
                 Title = "Test Shortage A",
                 Name = "Test Name A",
@@ -98,7 +98,7 @@ public class FileManagerTests
                 CreatedOn = DateTime.Now
             }
         },
-        { new ShortageKey("Test Shortage B", Category.Food), new Shortage()
+        { new ShortageKey("Test Shortage B", Room.Bathroom), new Shortage()
             {
                 Title = "Test Shortage B",
                 Name = "Test Name B",
