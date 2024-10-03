@@ -20,35 +20,31 @@ namespace ResourceShortageManager.Utilities
             };
         }
 
-        public Dictionary<ShortageKey, Shortage> DeserializeShortages(string filePath)
+        public Dictionary<string, Shortage> DeserializeShortages(string filePath)
         {
             if (!File.Exists(filePath))
             {
-                return new Dictionary<ShortageKey, Shortage>();
+                return new Dictionary<string, Shortage>();
             }
 
             using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(fileStream))
             {
                 string json = reader.ReadToEnd();
-                List<Shortage>? shortages = JsonSerializer.Deserialize<List<Shortage>>(json, _serializerOptions);
+                Dictionary<string, Shortage>? shortages = JsonSerializer.Deserialize<Dictionary<string, Shortage>>(json, _serializerOptions);
 
                 if (shortages is null)
                 {
-                    return new Dictionary<ShortageKey, Shortage>();
+                    return new Dictionary<string, Shortage>();
                 }
 
-                return shortages.ToDictionary(
-                    shortage => new ShortageKey(shortage.Title, shortage.Room),
-                    shortage => shortage
-                );
+                return shortages;
             }
         }
 
-        public void SerializeShortages(string filePath, Dictionary<ShortageKey, Shortage> shortages)
+        public void SerializeShortages(string filePath, Dictionary<string, Shortage> shortages)
         {
-            List<Shortage> shortagesList = shortages.Values.ToList();
-            string json = JsonSerializer.Serialize(shortagesList, _serializerOptions);
+            string json = JsonSerializer.Serialize(shortages, _serializerOptions);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
             using (var writer = new StreamWriter(fileStream))
@@ -56,5 +52,6 @@ namespace ResourceShortageManager.Utilities
                 writer.Write(json);
             }
         }
+
     }
 }

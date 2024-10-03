@@ -42,29 +42,31 @@ namespace ResourceShortageManager.UnitTests
         [Fact]
         public void DeserializeShortages_ValidFile_ReturnsShortagesDictionary()
         {
-            var shortagesList = new List<Shortage>
+            var shortages = new Dictionary<string, Shortage>
             {
-                new Shortage()
-                {
-                    Title = "Test Shortage A",
-                    Name = "Test Name A",
-                    Room = Room.MeetingRoom,
-                    Category = Category.Electronics,
-                    Priority = 1,
-                    CreatedOn = new DateTime(2021, 1, 1)
+                { "testshortageameetingroom", new Shortage()
+                    {
+                        Title = "TestShortageA",
+                        Name = "TestNameA",
+                        Room = Room.MeetingRoom,
+                        Category = Category.Electronics,
+                        Priority = 1,
+                        CreatedOn = new DateTime(2021, 1, 1)
+                    }
                 },
-                new Shortage()
-                {
-                    Title = "Test Shortage B",
-                    Name = "Test Name B",
-                    Room = Room.Bathroom,
-                    Category = Category.Food,
-                    Priority = 2,
-                    CreatedOn = new DateTime(2021, 2, 1)
+                { "testshortagebbathroom", new Shortage()
+                    {
+                        Title = "TestShortageB",
+                        Name = "TestNameB",
+                        Room = Room.Bathroom,
+                        Category = Category.Food,
+                        Priority = 2,
+                        CreatedOn = new DateTime(2021, 2, 1)
+                    }
                 }
             };
 
-            string json = JsonSerializer.Serialize(shortagesList, _serializerOptions);
+            string json = JsonSerializer.Serialize(shortages, _serializerOptions);
 
             // Write to file using FileStream
             using (var fileStream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -76,15 +78,15 @@ namespace ResourceShortageManager.UnitTests
             var result = _fileManager.DeserializeShortages(_filePath);
 
             Assert.Equal(2, result.Count);
-            Assert.True(result.ContainsKey(new ShortageKey("Test Shortage A", Room.MeetingRoom)));
-            Assert.True(result.ContainsKey(new ShortageKey("Test Shortage B", Room.Bathroom)));
+            Assert.True(result.ContainsKey("testshortageameetingroom"));
+            Assert.True(result.ContainsKey("testshortagebbathroom"));
         }
 
         [Fact]
-        public void SerializeShortages_EmptyDictionary_WritesEmptyArrayToFile()
+        public void SerializeShortages_EmptyDictionary_WritesEmptyObjectToFile()
         {
             // Arrange
-            var shortages = new Dictionary<ShortageKey, Shortage>();
+            var shortages = new Dictionary<string, Shortage>();
 
             // Act
             _fileManager.SerializeShortages(_filePath, shortages);
@@ -94,20 +96,21 @@ namespace ResourceShortageManager.UnitTests
             using (var reader = new StreamReader(fileStream))
             {
                 var json = reader.ReadToEnd();
-                Assert.Equal("[]", json);
+                Assert.Equal("{}", json);
             }
         }
+
 
         [Fact]
         public void SerializeShortages_FileOverwrite_ReplacesPreviousContent()
         {
             // Arrange
-            var initialShortages = new Dictionary<ShortageKey, Shortage>
+            var initialShortages = new Dictionary<string, Shortage>
             {
-                { new ShortageKey("Initial Shortage", Room.MeetingRoom), new Shortage
+                { new string("InitialShortage" + Room.MeetingRoom), new Shortage
                     {
-                        Title = "Initial Shortage",
-                        Name = "Initial Name",
+                        Title = "InitialShortage",
+                        Name = "InitialName",
                         Room = Room.MeetingRoom,
                         Category = Category.Electronics,
                         Priority = 1,
@@ -118,12 +121,12 @@ namespace ResourceShortageManager.UnitTests
             _fileManager.SerializeShortages(_filePath, initialShortages);
 
             // Act
-            var newShortages = new Dictionary<ShortageKey, Shortage>
+            var newShortages = new Dictionary<string, Shortage>
             {
-                { new ShortageKey("New Shortage", Room.Bathroom), new Shortage
+                { new string("NewShortage" + Room.Bathroom), new Shortage
                     {
-                        Title = "New Shortage",
-                        Name = "New Name",
+                        Title = "NewShortage",
+                        Name = "NewName",
                         Room = Room.Bathroom,
                         Category = Category.Food,
                         Priority = 2,
@@ -138,11 +141,11 @@ namespace ResourceShortageManager.UnitTests
             using (var reader = new StreamReader(fileStream))
             {
                 var json = reader.ReadToEnd();
-                var deserializedShortages = JsonSerializer.Deserialize<List<Shortage>>(json, _serializerOptions);
+                var deserializedShortages = JsonSerializer.Deserialize<Dictionary<string, Shortage>>(json, _serializerOptions);
 
                 Assert.NotNull(deserializedShortages);
-                Assert.Single(deserializedShortages); // Only 1 shortage should be present
-                Assert.Contains(deserializedShortages, s => s.Title == "New Shortage" && s.Room == Room.Bathroom);
+                Assert.Single(deserializedShortages);
+                Assert.Contains(deserializedShortages, s => s.Value.Title == "NewShortage" && s.Value.Room == Room.Bathroom);
             }
         }
 

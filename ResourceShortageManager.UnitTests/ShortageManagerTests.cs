@@ -49,7 +49,7 @@ public class ShortageManagerTests : IDisposable
         // Assert
         Assert.Equal(Status.AddedSuccessfully, result);
         var shortages = _fileManager.DeserializeShortages(_filePath);
-        var key = new ShortageKey(title, room);
+        var key = Shortage.MakeKey(title, room);
         Assert.True(shortages.ContainsKey(key));
         Assert.Equal(priority, shortages[key].Priority);
     }
@@ -63,9 +63,9 @@ public class ShortageManagerTests : IDisposable
         var category = Category.Other;
         var priority = 9;
 
-        var shortagesList = new List<Shortage>
+        var shortages = new Dictionary<string, Shortage>
         {
-            new Shortage()
+        { title.ToLower() + room.ToString().ToLower(), new Shortage()
             {
                 Title = title,
                 Name = _currUser,
@@ -73,10 +73,11 @@ public class ShortageManagerTests : IDisposable
                 Category = category,
                 Priority = priority,
                 CreatedOn = new DateTime(2021, 2, 1)
+                }
             }
         };
 
-        string json = JsonSerializer.Serialize(shortagesList, _serializerOptions);
+        string json = JsonSerializer.Serialize(shortages, _serializerOptions);
 
         using (var fileStream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None))
         using (var writer = new StreamWriter(fileStream))
@@ -94,8 +95,8 @@ public class ShortageManagerTests : IDisposable
 
         // Assert
         Assert.Equal(Status.RemovedSuccessfully, result);
-        var shortages = _fileManager.DeserializeShortages(_filePath);
-        var key = new ShortageKey(title, room);
+        shortages = _fileManager.DeserializeShortages(_filePath);
+        var key = Shortage.MakeKey(title, room);
         Assert.False(shortages.ContainsKey(key));
     }
 
@@ -227,9 +228,9 @@ public class ShortageManagerTests : IDisposable
             Priority = existingPriority,
             CreatedOn = DateTime.Now
         };
-        var shortages = new Dictionary<ShortageKey, Shortage>
+        var shortages = new Dictionary<string, Shortage>
         {
-            { new ShortageKey(title, room), existingShortage }
+            { existingShortage.MakeKey(), existingShortage }
         };
         _fileManager.SerializeShortages(_filePath, shortages);
         _shortageManager = new ShorageManager(_currUser, _filePath);
@@ -244,7 +245,7 @@ public class ShortageManagerTests : IDisposable
         // Assert
         Assert.Equal(Status.AlreadyExists, result);
         var updatedShortages = _fileManager.DeserializeShortages(_filePath);
-        var key = new ShortageKey(title, room);
+        var key = Shortage.MakeKey(title, room);
         Assert.True(updatedShortages.ContainsKey(key));
         Assert.Equal(existingPriority, updatedShortages[key].Priority);
     }
@@ -257,7 +258,7 @@ public class ShortageManagerTests : IDisposable
         var room = Room.Kitchen;
 
         var shortages = _fileManager.DeserializeShortages(_filePath);
-        var key = new ShortageKey(title, room);
+        var key = Shortage.MakeKey(title, room);
         Assert.False(shortages.ContainsKey(key));
 
         // Simulate user input

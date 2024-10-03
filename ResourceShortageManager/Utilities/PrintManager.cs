@@ -140,7 +140,7 @@ namespace ResourceShortageManager.Utilities
             Console.WriteLine(header);
             Console.WriteLine(separator);
         }
-        public static void PrintShortagesList(Dictionary<ShortageKey, Shortage> shortages)
+        public static void PrintShortagesList(Dictionary<string, Shortage> shortages)
         {
             Console.WriteLine("Registered shortages:");
 

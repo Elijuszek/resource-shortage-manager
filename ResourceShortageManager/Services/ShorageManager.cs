@@ -7,7 +7,7 @@ public class ShorageManager
 {
     private readonly string _currentUser;
     private readonly string _pathJson;
-    private Dictionary<ShortageKey, Shortage> _shortages;
+    private Dictionary<string, Shortage> _shortages;
     private FileManager _fileManager;
 
     public ShorageManager(string username, string filePath)
@@ -101,13 +101,7 @@ public class ShorageManager
         if (priority == -1) return Status.None;
 
         // Check if shortage with higher priority already exists
-        ShortageKey key = new(title, room);
-        if (_shortages.ContainsKey(key) && _shortages[key].Priority >= priority)
-        {
-            return Status.AlreadyExists;
-        }
 
-        // Add shortage
         Shortage shortage = new()
         {
             Title = title,
@@ -117,6 +111,12 @@ public class ShorageManager
             Priority = priority,
             CreatedOn = DateTime.Now
         };
+
+        string key = shortage.MakeKey();
+        if (_shortages.ContainsKey(key) && _shortages[key].Priority >= priority)
+        {
+            return Status.AlreadyExists;
+        }
 
         _shortages[key] = shortage;
 
@@ -136,7 +136,7 @@ public class ShorageManager
         Room room = PrintManager.PromptRoom("Enter room");
         if (room == Room.None) return Status.None;
 
-        ShortageKey key = new(title, room);
+        string key = Shortage.MakeKey(title, room);
 
         // Check if the shortage exists and currentUser can view it
         if (!_shortages.ContainsKey(key) || _shortages[key].Name != _currentUser
